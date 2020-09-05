@@ -1,0 +1,33 @@
+{
+  "name": "socketio-chatapp",
+  "version": "1.0.0",
+  "description": "a chatapp on socketio and mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chukwumaokere/socketio-chatapp.git"
+  },
+  "keywords": [
+    "vtiger",
+    "chatapp",
+    "socketio",
+    "mongodb",
+    "express",
+    "npm"
+  ],
+  "author": "chukwumaokere",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chukwumaokere/socketio-chatapp/issues"
+  },
+  "homepage": "https://github.com/chukwumaokere/socketio-chatapp#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.3",
+    "socket.io": "^2.3.0"
+  }
+}
