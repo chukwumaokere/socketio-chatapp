@@ -325,11 +325,12 @@
             });  
             function openChat(){
                 console.log('joining a chat room');
-                socket.emit('join_random_room');
+                socket.emit('join_room', 74);
                 document.getElementById('chat-button').style.display = "none";
                 document.getElementById('chat-widget').style.display = "flex";
             }
             function closeChat(){
+                socket.emit('leave_room')
                 document.getElementById('chat-button').style.display = "inline-block";
                 document.getElementById('chat-widget').style.display = "none";
             }

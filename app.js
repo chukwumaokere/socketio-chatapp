@@ -33,6 +33,8 @@ Users.watch().on('change',(change)=>{
 })
 */
 
+const { isValidObjectId } = require('mongoose');
+
 var server = require('socket.io').listen(8084);
 
 server.sockets.on('connection', function (socket) {
@@ -41,15 +43,19 @@ server.sockets.on('connection', function (socket) {
 		//send this message to all sockets
 	});
 	socket.on('join_room', function(roomId) {
-		console.log('socket joining room', roomId);
-		socket.join(roomId);
+		socket.send('socket joining room ' + roomId);
+		socket.join(roomId)
+		socket.send('socket joined room ' + roomId + ' successfully')
+		server.to(roomId).send('a new user has entered the chat room')
 	});
 	socket.on('join_random_room', function(){
-		socket.join()
 
 	});
 	socket.on('create_room', function(roomId){
 		console.log('Creating chat room', roomId);
+		socket.send('Creating chat room ' + roomId);
+		socket.send('Joining Chat Room ' + roomId);
+		socket.join(roomId);
 	});
 	socket.on('disconnect', function () {
 		console.log('disconnected!')
@@ -57,4 +63,7 @@ server.sockets.on('connection', function (socket) {
 	socket.on('get_rooms', function(){
 
 	});
+	socket.on('leave_room', function(roomId){
+		socket.leave(roomId)
+	})
 });
