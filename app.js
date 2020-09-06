@@ -63,7 +63,10 @@ server.sockets.on('connection', function (socket) {
 	socket.on('get_rooms', function(){
 
 	});
-	socket.on('leave_room', function(roomId){
+	socket.on('leave_room', function(){
+		const rooms = Object.keys(socket.rooms);
+		const roomId = rooms[0];
 		socket.leave(roomId)
+		server.to(roomId).send('a user has left the chat room');
 	})
 });
