@@ -330,6 +330,7 @@
                 document.getElementById('chat-widget').style.display = "flex";
             }
             function closeChat(){
+                socket.emit('leave_room')
                 document.getElementById('chat-button').style.display = "inline-block";
                 document.getElementById('chat-widget').style.display = "none";
             }

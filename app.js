@@ -49,7 +49,11 @@ server.sockets.on('connection', function (socket) {
 		server.to(roomId).send('a new user has entered the chat room')
 	});
 	socket.on('join_random_room', function(){
-
+		var roomId = getAvailableRoom();
+		socket.send('socket joining room ' + roomId);
+		socket.join(roomId)
+		socket.send('socket joined room ' + roomId + ' successfully')
+		server.to(roomId).send('a new user has entered the chat room')
 	});
 	socket.on('create_room', function(roomId){
 		console.log('Creating chat room', roomId);
@@ -60,9 +64,14 @@ server.sockets.on('connection', function (socket) {
 	socket.on('disconnect', function () {
 		console.log('disconnected!')
 	});
-	socket.on('get_rooms', function(){
-
-	});
+	function getRooms(){
+		const rooms = server.sockets.adapter.rooms;
+		return rooms;
+	}
+	function getAvailableRoom(){
+		const rooms = getRooms();
+		const availableRoom; // = room with only 1 connected socket;
+	}
 	socket.on('leave_room', function(){
 		const rooms = Object.keys(socket.rooms);
 		const roomId = rooms[0];
