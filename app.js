@@ -33,13 +33,28 @@ Users.watch().on('change',(change)=>{
 })
 */
 
-var io = require('socket.io').listen(8084);
+var server = require('socket.io').listen(8084);
 
-io.sockets.on('connection', function (socket) {
+server.sockets.on('connection', function (socket) {
 	socket.on('message', function (e) {
 		console.log(e); 
 		//send this message to all sockets
 	});
-	
-	socket.on('disconnect', function () { console.log('disconnected!')});
+	socket.on('join_room', function(roomId) {
+		console.log('socket joining room', roomId);
+		socket.join(roomId);
+	});
+	socket.on('join_random_room', function(){
+		socket.join()
+
+	});
+	socket.on('create_room', function(roomId){
+		console.log('Creating chat room', roomId);
+	});
+	socket.on('disconnect', function () {
+		console.log('disconnected!')
+	});
+	socket.on('get_rooms', function(){
+
+	});
 });
