@@ -38,7 +38,7 @@
         </li>
       </ul>
     </nav>
-    
+    <span class="dropdown span"><span class="dropdown-toggle" data-toggle="dropdown" href="#"><a id="menubar_item_right_Charles" class="userName textOverflowEllipsis" title="Philip"><strong>Philip</strong>&nbsp;<i class="caret"></i> </a> </span><ul class="dropdown-menu pull-right"><li><a target="" id="menubar_item_right_LBL_MY_PREFERENCES" href="index.php?module=Users&amp;view=PreferenceDetail&amp;record=74">My Preferences</a></li><li class="divider">&nbsp;</li><li><a target="" id="menubar_item_right_LBL_SIGN_OUT" href="?module=Users&amp;parent=Settings&amp;action=Logout">Sign Out</a></li></ul></span>
     <div class="container-fluid">
       <div class="row">
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
@@ -318,6 +318,7 @@
         <script type="text/javascript" src="js/socket.io.js"></script>
         <script>
            var current_user_id = document.getElementById('current_user_id').value;
+           var userName = document.getElementsByClassName('userName')[0].title;
            const messagediv = document.getElementById('conversation-body');
             var socket = io.connect('http://localhost:8084');
             socket.on('connect', function () {
@@ -326,10 +327,10 @@
                     console.log(msg);
                     if(msg == "There are no available rooms right now, please wait for a chat supervisor to become available"){
                       $("#conversation-body").append($('<p style="font-weight:bold">').text(msg));
-                      var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-                      if (shouldScroll){
-                          scrollToBottom();
-                      }
+                        var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                        if (shouldScroll){
+                            scrollToBottom();
+                        }
                     }
                 });
                 socket.on('chat_message_received', function(message, c_u_id){
@@ -341,14 +342,14 @@
                       }
                 })
                 socket.on('user_joined', function(user, user_id){
-                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User ID: ' + user_id + ' has joined the room'));
+                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User: ' + user_id + ' has joined the room'));
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
                         scrollToBottom();
                     }
                 })
                 socket.on('user_left', function(user, user_id){
-                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User ID: ' + user_id + ' has left the room'));
+                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User: ' + user_id + ' has left the room'));
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
                         scrollToBottom();
@@ -356,18 +357,18 @@
                 })
             });  
             function openChat(){
-                socket.emit('join_random_room', current_user_id);
+                socket.emit('join_random_room', userName);
                 document.getElementById('chat-button').style.display = "none";
                 document.getElementById('chat-widget').style.display = "flex";
             }
             function closeChat(){
-                socket.emit('leave_room', current_user_id)
+                socket.emit('leave_room', userName)
                 document.getElementById('chat-button').style.display = "inline-block";
                 document.getElementById('chat-widget').style.display = "none";
             }
             $('#message-form').submit(function(e){
                 e.preventDefault();
-                socket.emit('chat_message', $('#input-message').val(), current_user_id);
+                socket.emit('chat_message', $('#input-message').val(), userName);
                 $('#input-message').val('');
                 return false;
             })
