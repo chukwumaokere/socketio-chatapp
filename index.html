@@ -328,6 +328,12 @@
                     console.log('chat message received', message);
                     $("#conversation-body").append($('<li>').text(message));
                 })
+                socket.on('user_joined', function(user){
+                  $("#conversation-body").append($('<li>').text(user + ' has joined the room'));
+                })
+                socket.on('user_left', function(user){
+                  $("#conversation-body").append($('<li>').text(user + ' has left the room'));
+                })
             });  
             function openChat(){
                 console.log('joining a chat room');

@@ -18,6 +18,7 @@ server.sockets.on('connection', function (socket) {
 				socket.join(roomId);
 				socket.send('socket joined room ' + roomId + ' successfully')
 				server.to(roomId).send('a new user has entered the chat room')
+				server.to(roomId).emit('user_joined', socket.id);
 			}else{
 				socket.send('There are no available rooms right now, please wait for a chat supervisor to become available');
 			}
@@ -60,12 +61,11 @@ server.sockets.on('connection', function (socket) {
 		const roomId = rooms[0];
 		socket.leave(roomId)
 		server.to(roomId).send('a user has left the chat room');
+		server.to(roomId).emit('user_left', socket.id);
 	})
 	socket.on('chat_message', function(message){
 		console.log('message received:', message);
 		var room = Object.keys(socket.rooms)[0];
 		server.to(room).emit('chat_message_received', message);
-		//.send(message);
-		//.emit('')
 	})
 });
