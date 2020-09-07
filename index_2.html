@@ -344,7 +344,8 @@
                 })
                 socket.on('user_joined', function(user, user_id){
                   $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
-                    document.getElementById('rep-name').innerHTML = user_id;
+                    //document.getElementById('rep-name').innerHTML = "Connected";
+                    document.getElementById('rep-name').innerHTML = "Connected";
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
                         scrollToBottom();
