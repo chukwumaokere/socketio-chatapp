@@ -61,4 +61,11 @@ server.sockets.on('connection', function (socket) {
 		socket.leave(roomId)
 		server.to(roomId).send('a user has left the chat room');
 	})
+	socket.on('chat_message', function(message){
+		console.log('message received:', message);
+		var room = Object.keys(socket.rooms)[0];
+		server.to(room).emit('chat_message_received', message);
+		//.send(message);
+		//.emit('')
+	})
 });

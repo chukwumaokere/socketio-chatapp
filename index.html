@@ -293,15 +293,17 @@
                 <div class="card-body">
                     <div id="message-date" style="text-align: center; color: rgb(0 0 0 / 50%);">FRI 12:33PM</div>
                     <div id="conversation-body">
-                        YO SOMETHING GOES HERE 
+                       
                     </div>
                 </div>
-                <div id="conversation-input" class="input-group input-group-md" style="box-shadow: 0 5px 25px 0 rgba(0,0,0,.30)">
-                    <input type="text" class="form-control" placeholder="Enter your message here..." aria-label="message">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-info" type="button">Send</button>
-                      </div>
-                </div>
+                <form action="" id="message-form">
+                    <div id="conversation-input" class="input-group input-group-md" style="box-shadow: 0 5px 25px 0 rgba(0,0,0,.30)">
+                        <input id="input-message" type="text" class="form-control" autocomplete="off" placeholder="Enter your message here..." aria-label="message">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-info" type="Submit">Send</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -322,6 +324,10 @@
                 socket.on('message', function (msg) {
                     console.log(msg);
                 });
+                socket.on('chat_message_received', function(message){
+                    console.log('chat message received', message);
+                    $("#conversation-body").append($('<li>').text(message));
+                })
             });  
             function openChat(){
                 console.log('joining a chat room');
@@ -334,6 +340,12 @@
                 document.getElementById('chat-button').style.display = "inline-block";
                 document.getElementById('chat-widget').style.display = "none";
             }
+            $('#message-form').submit(function(e){
+                e.preventDefault();
+                socket.emit('chat_message', $('#input-message').val());
+                $('#input-message').val('');
+                return false;
+            })
         </script>
     </body>
 </html>
