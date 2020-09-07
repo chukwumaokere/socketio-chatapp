@@ -280,7 +280,7 @@
           <div class="card" id="chat-widget" style="width: 20rem;position: fixed;bottom: 20px;right: 30px;z-index: 99;z-index: 1000; min-height: 30rem;box-shadow: 0 5px 25px 0 rgba(0,0,0,.30); display: none;"> 
               <div class="card-header text-white bg-info">
                   <div class="container row mx-0 px-0">
-                      <div id="rep-name" style="width: max-content">Jessica</div>
+                      <div id="rep-name" style="width: max-content">Awaiting Chat...</div>
                       <a type="button" class="ml-auto float-right" style="align-self: center;" onclick="closeChat()">
                           <i class="flex" style="display: flex; align-items: center; justify-content: center;">
                               <svg style="fill: white;" width="17" height="17" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
@@ -327,6 +327,7 @@
                     console.log(msg);
                     if(msg == "There are no available rooms right now, please wait for a chat supervisor to become available"){
                       $("#conversation-body").append($('<p style="font-weight:bold">').text(msg));
+                        document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
                         var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                         if (shouldScroll){
                             scrollToBottom();
@@ -342,14 +343,16 @@
                       }
                 })
                 socket.on('user_joined', function(user, user_id){
-                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User: ' + user_id + ' has joined the room'));
+                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
+                    document.getElementById('rep-name').innerHTML = user_id;
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
                         scrollToBottom();
                     }
                 })
                 socket.on('user_left', function(user, user_id){
-                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User: ' + user_id + ' has left the room'));
+                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has left the room'));
+                    document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
                         scrollToBottom();
