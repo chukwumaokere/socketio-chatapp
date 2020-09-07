@@ -1,0 +1,17 @@
+# Code for an easily embeddable chat app
+
+This chat app emulates the same idea of running a chat app using something like Google Firebase.
+It has the advantages of software like https://www.ringcentral.com/digital-customer-engagement.html or any other customer engagement service, FREE OF COST. It has no concurrent connection limit 
+
+## How to run:
+1) embed the HTML and script into your index.html file
+2) Run the app.js using Node `node app.js`
+3) Open the chat on the Index pages
+
+## TODO 
+1) add support for keeping message logs in localStorage
+2) Refreshing or navigating should keep the session open, and reload the chat since VT is not an SPA
+3) Add support for auto-connecting if the chat window is already open
+4) Bold the message senders name
+5) Fix the date stamp
+
