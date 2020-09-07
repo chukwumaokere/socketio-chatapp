@@ -15,30 +15,13 @@ var availableRoom = Object.values(rooms).filter(obj => {
        availableRooms.push(Object.keys(rooms).find(key => rooms[key] === obj));
     }
 });
-/*
-var filtered_keys = function(obj, filter) {
-    var key, keys = [];
-    for (key in obj) {
-        if (obj.hasOwnProperty(key) && filter.test(key)) {
-        keys.push(key);
-        }
-    }
-    return keys;
-}
-*/
+
 availableRooms.forEach(function(room){
     if(room.match(/(^\d+$)/)){
         //console.log(room);
         filteredRooms.push(room);
     };
 })
-//var filteredRooms = filtered_keys(availableRooms, /(^\d+$)/)
-//const chosenRoom = filteredRooms[0]; // first in line, round robin
 
-
-
-//console.log(chosenRoom);
-
-//console.log(availableRooms)
 const chosenRoom = filteredRooms[0];
 console.log(chosenRoom);
