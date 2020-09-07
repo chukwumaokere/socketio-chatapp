@@ -49,11 +49,12 @@ server.sockets.on('connection', function (socket) {
 		server.to(roomId).send('a new user has entered the chat room')
 	});
 	socket.on('join_random_room', function(){
-		var roomId = getAvailableRoom();
-		socket.send('socket joining room ' + roomId);
-		socket.join(roomId)
-		socket.send('socket joined room ' + roomId + ' successfully')
-		server.to(roomId).send('a new user has entered the chat room')
+		getAvailableRoom().then(roomId => {
+			socket.send('joining random room: ' + roomId);
+			socket.join(roomId);
+			socket.send('socket joined room ' + roomId + ' successfully')
+			server.to(roomId).send('a new user has entered the chat room')
+		});
 	});
 	socket.on('create_room', function(roomId){
 		console.log('Creating chat room', roomId);
@@ -68,9 +69,30 @@ server.sockets.on('connection', function (socket) {
 		const rooms = server.sockets.adapter.rooms;
 		return rooms;
 	}
-	function getAvailableRoom(){
+	async function getAvailableRoom(){
 		const rooms = getRooms();
-		const availableRoom; // = room with only 1 connected socket;
+		let availableRooms = [];
+		var availableRoom = Object.values(rooms).filter(obj => {
+			if (obj.length < 2){
+				availableRooms.push(Object.keys(rooms).find(key => rooms[key] === obj));
+			}
+		});
+		
+		var filtered_keys = function(obj, filter) {
+			var key, keys = [];
+			for (key in obj) {
+				if (obj.hasOwnProperty(key) && filter.test(key)) {
+				keys.push(key);
+				}
+			}
+			return keys;
+		}
+		
+		var filteredRooms = filtered_keys(rooms, /(^\d+$)/) // rooms that match the regex, valid rooms
+		const chosenRoom = filteredRooms[0]; // = room with only 1 connected socket; first in line, round robin
+		
+		return chosenRoom;
+		//return arrayOfObs;
 	}
 	socket.on('leave_room', function(){
 		const rooms = Object.keys(socket.rooms);
