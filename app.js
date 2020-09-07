@@ -11,14 +11,14 @@ server.sockets.on('connection', function (socket) {
 		socket.send('socket joined room ' + roomId + ' successfully')
 		server.to(roomId).send('a new user has entered the chat room')
 	});
-	socket.on('join_random_room', function(){
+	socket.on('join_random_room', function(user_id){
 		getAvailableRoom().then(roomId => {
 			if (roomId !== undefined){
 				socket.send('joining random room: ' + roomId);
 				socket.join(roomId);
 				socket.send('socket joined room ' + roomId + ' successfully')
 				server.to(roomId).send('a new user has entered the chat room')
-				server.to(roomId).emit('user_joined', socket.id);
+				server.to(roomId).emit('user_joined', socket.id, user_id);
 			}else{
 				socket.send('There are no available rooms right now, please wait for a chat supervisor to become available');
 			}
@@ -56,16 +56,16 @@ server.sockets.on('connection', function (socket) {
 
 		return chosenRoom;
 	}
-	socket.on('leave_room', function(){
+	socket.on('leave_room', function(user_id){
 		const rooms = Object.keys(socket.rooms);
 		const roomId = rooms[0];
 		socket.leave(roomId)
 		server.to(roomId).send('a user has left the chat room');
-		server.to(roomId).emit('user_left', socket.id);
+		server.to(roomId).emit('user_left', socket.id, user_id);
 	})
-	socket.on('chat_message', function(message){
+	socket.on('chat_message', function(message, current_user_id){
 		console.log('message received:', message);
 		var room = Object.keys(socket.rooms)[0];
-		server.to(room).emit('chat_message_received', message);
+		server.to(room).emit('chat_message_received', message, current_user_id);
 	})
 });

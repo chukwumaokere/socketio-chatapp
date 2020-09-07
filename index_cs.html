@@ -324,15 +324,15 @@
                     console.log(msg);
                 });
                 socket.emit('create_room', current_user_id);
-                socket.on('chat_message_received', function(message){
+                socket.on('chat_message_received', function(message, c_u_id){
                     console.log('chat message received', message);
-                    $("#conversation-body").append($('<li>').text(message));
+                    $("#conversation-body").append($('<li>').text(c_u_id + ': ' + message));
                 })
-                socket.on('user_joined', function(user){
-                  $("#conversation-body").append($('<li>').text(user + ' has joined the room'));
+                socket.on('user_joined', function(user, user_id){
+                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User ID: ' + user_id + ' has joined the room'));
                 })
-                socket.on('user_left', function(user){
-                  $("#conversation-body").append($('<li>').text(user + ' has left the room'));
+                socket.on('user_left', function(user, user_id){
+                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('User ID: ' + user_id + ' has left the room'));
                 })
             }); 
             function openChat(){
@@ -345,7 +345,7 @@
             } 
             $('#message-form').submit(function(e){
                 e.preventDefault();
-                socket.emit('chat_message', $('#input-message').val());
+                socket.emit('chat_message', $('#input-message').val(), current_user_id);
                 $('#input-message').val('');
                 return false;
             })
