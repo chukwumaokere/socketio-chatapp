@@ -318,21 +318,22 @@
         <script src="js/dashboard.js"></script>
         <script type="text/javascript" src="js/socket.io.js"></script>
         <script>
-            var current_user_id = document.getElementById('current_user_id').value;
-            var userName = document.getElementsByClassName('userName')[0].title;
-            const messagediv = document.getElementById('conversation-body');
-            var socket = io.connect('http://localhost:8084');
+           var current_user_id = document.getElementById('current_user_id').value;
+           var userName = document.getElementsByClassName('userName')[0].title;
+           const messagediv = document.getElementById('conversation-body');
+           var inRoom = false;
+           var socket = io.connect('http://localhost:8084');
             socket.on('connect', function () {
-                socket.send('regular user connected to server');
+                socket.send('regular user 2 connected to server');
                 socket.on('message', function (msg) {
                     console.log(msg);
-                    if(msg == "There are no available rooms right now, please wait for a chat supervisor to become available"){
+                    if(msg == "There are no available rooms right now, please wait for a chat supervisor to become available" && inRoom == false){
+                      document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
                       $("#conversation-body").append($('<p style="font-weight:bold">').text(msg));
-                        document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
-                        var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-                        if (shouldScroll){
-                            scrollToBottom();
-                        }
+                      var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                      if (shouldScroll){
+                          scrollToBottom();
+                      }
                     }
                 });
                 socket.on('chat_message_received', function(message, c_u_id){
@@ -345,7 +346,8 @@
                 })
                 socket.on('user_joined', function(user, user_id){
                   $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
-                    //document.getElementById('rep-name').innerHTML = user_id;
+                    //document.getElementById('rep-name').innerHTML = "Connected";
+                    //inRoom = true;
                     document.getElementById('rep-name').innerHTML = "Connected";
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
