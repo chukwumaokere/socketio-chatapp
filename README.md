@@ -4,7 +4,7 @@ This chat app emulates the same idea of running a chat app using something like 
 It has the advantages of software like https://www.ringcentral.com/digital-customer-engagement.html or any other customer engagement service, FREE OF COST. It has no concurrent connection limit 
 
 ## How to run:
-1) embed the HTML and script into your index.html file
+1) Embed the HTML and script into your index.html file
 2) Run the app.js using Node `node app.js`
 3) Open the chat on the Index pages
 
