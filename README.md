@@ -12,7 +12,7 @@ It has the advantages of software like https://www.ringcentral.com/digital-custo
 1) add support for keeping message logs in localStorage
 2) Refreshing or navigating should keep the session open, and reload the chat since VT is not an SPA
 3) Add support for auto-connecting if the chat window is already open and user navigates or refresh (will need to store the value of the connected room then use JS to reopen and reconnect to a specific room using join_room directly)
-4) If msg == room is full, setTimeout every 30 seconds join_random_room until joinedRoom == true
+~~4) If msg == room is full, setTimeout every 30 seconds join_random_room until joinedRoom == true~~
 5) Bold the message senders name
 6) Fix the date stamp
 

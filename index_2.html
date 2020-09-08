@@ -328,11 +328,16 @@
                     console.log(msg);
                     if(msg == "There are no available rooms right now, please wait for a chat supervisor to become available" && inRoom == false){
                       document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
+                      console.log('Retrying connection...');
                       $("#conversation-body").append($('<p style="font-weight:bold">').text(msg));
+                      $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('Retrying connection...'));
                       var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                       if (shouldScroll){
                           scrollToBottom();
                       }
+                      setTimeout(function(){ 
+                        openChat();
+                      }, 3000);
                     }
                 });
                 socket.on('chat_message_received', function(message, c_u_id){
@@ -346,7 +351,7 @@
                 socket.on('user_joined', function(user, user_id){
                   $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
                     //document.getElementById('rep-name').innerHTML = "Connected";
-                    //inRoom = true;
+                    inRoom = true;
                     document.getElementById('rep-name').innerHTML = "Connected";
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
@@ -369,6 +374,7 @@
             }
             function closeChat(){
                 socket.emit('leave_room', userName)
+                inRoom = false;
                 document.getElementById('chat-button').style.display = "inline-block";
                 document.getElementById('chat-widget').style.display = "none";
             }
