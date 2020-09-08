@@ -15,3 +15,4 @@ It has the advantages of software like https://www.ringcentral.com/digital-custo
 4) ~~If msg == room is full, setTimeout every 30 seconds join_random_room until joinedRoom == true~~
 5) Bold the message senders name
 6) Fix the date stamp
+7) ~~Render messages on opposite sides~~

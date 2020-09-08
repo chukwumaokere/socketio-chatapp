@@ -348,7 +348,14 @@
                 });
                 socket.on('chat_message_received', function(message, c_u_id){
                     console.log('chat message received', message);
-                    $("#conversation-body").append($('<li>').text(c_u_id + ': ' + message));
+                    var tag;
+                    if(c_u_id == userName){
+                        tag = '<p style="text-align:right; margin-bottom:0px;">';
+                        $("#conversation-body").append($(tag).text(message + ': You'));
+                    }else{
+                        tag = '<p style="margin-bottom:0px;">';
+                        $("#conversation-body").append($(tag).text(c_u_id + ': ' + message));
+                    }
                       var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                       if (shouldScroll){
                           scrollToBottom();
