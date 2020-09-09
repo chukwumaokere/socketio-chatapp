@@ -23,15 +23,15 @@ It has the advantages of software like https://www.ringcentral.com/digital-custo
 ### DEMO:
 
 #### New Version: 
-Image of chat that fills up the screen from Customer Service perspective  
+Image of chat that fills up the screen from Customer Service perspective   
 ![Image of chat that fills up the screen from Customer Service representative perspective](https://i.gyazo.com/8513f7e373bb7df90140efa13d575aa9.png)
-Image of chat that fills up the screen from Customers perspective  
+Image of chat that fills up the screen from Customers perspective    
 ![Image of chat that fills up the screen from Customers perspective](https://i.gyazo.com/24b3ac4243cd2a804d4e3d5db0f32f13.png)
-Image of the retrying connection function  
+Image of the retrying connection function    
 ![Image of the retrying conncetion function](https://i.gyazo.com/24246dac3706102403d7bf66e53d7b0e.png)
-Image of the retrying connection function finding an available room  
+Image of the retrying connection function finding an available room    
 ![Image of the retrying connection function finding an available room](https://i.gyazo.com/9147246a3aeba22cba63c0519b3a8fdc.png)
-Image of swapping customers from the Customer Service Representative perspective  
+Image of swapping customers from the Customer Service Representative perspective    
 ![Image of swapping customers from the Customer Service Representative perspective](https://i.gyazo.com/870049965e7c6f70847a5ae6f2a89d5d.png)
 
 #### Old version: 
