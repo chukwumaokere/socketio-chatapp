@@ -291,7 +291,7 @@
                   </div>
               </div>
               <div class="card-body">
-                  <div id="message-date" style="text-align: center; color: rgb(0 0 0 / 50%);">FRI 12:33PM</div>
+                  <div id="message-date" style="text-align: center; color: rgb(0 0 0 / 50%);">DAY 00:00AM</div>
                   <div id="conversation-body" style="max-height: 20rem; overflow: auto;">
                      
                   </div>
@@ -327,16 +327,29 @@
                 });
                 socket.emit('create_room', current_user_id);
                 socket.on('chat_message_received', function(message, c_u_id){
+                    var today = new Date();
+                    var minutes = today.getMinutes();
+                    var hours = today.getHours();
+                    var ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12;
+                    if (minutes < 10){
+                      minutes = '0' + minutes;
+                    }
+                    var time = today.getHours() + ":" + minutes;
                     console.log('chat message received', message);
                     if(c_u_id == userName){
-                        $("#conversation-body").append($('<p style="text-align:right; margin-bottom:0px;">').text(message).append('<strong> :You</strong>'));
+                      
+                      $("#conversation-body").append($('<p class="bg-info text-white border-info" style="margin-left: auto;margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
+                        $("#conversation-body").append($('<p style="text-align:right;margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
                     }else{
-                        $("#conversation-body").append($('<p style="margin-bottom:0px;">').text(message).prepend("<strong>"+c_u_id+": </strong>"));
+                        $("#conversation-body").append($('<p class="bg-secondary text-white border-secondary" style="margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
+                        $("#conversation-body").append($('<p style="margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
                     }
-                      var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-                      if (shouldScroll){
-                          scrollToBottom();
-                      }
+                    var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                    if (shouldScroll){
+                        scrollToBottom();
+                    }
                 })
                 socket.on('user_joined', function(user, user_id){
                   $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
@@ -357,6 +370,7 @@
                 })
             }); 
             function openChat(){
+                updateDate();
                 document.getElementById('chat-button').style.display = "none";
                 document.getElementById('chat-widget').style.display = "flex";
             }
@@ -372,6 +386,29 @@
             })
             function scrollToBottom(){
               messagediv.scrollTop = messagediv.scrollHeight;
+            }
+            function updateDate(){
+              var d = new Date();
+              var weekday = new Array(7);
+              var hours = d.getHours();
+              var ampm = hours >= 12 ? 'PM' : 'AM';
+              hours = hours % 12;
+              hours = hours ? hours : 12;
+              weekday[0] = "SUN";
+              weekday[1] = "MON";
+              weekday[2] = "TUES";
+              weekday[3] = "WED";
+              weekday[4] = "THURS";
+              weekday[5] = "FRI";
+              weekday[6] = "SAT";
+              var minutes = d.getMinutes();
+              if (minutes < 10){
+                minutes = '0' + minutes;
+              }
+              var time = d.getHours() + ":" + minutes;
+
+              var n = weekday[d.getDay()];
+              document.getElementById('message-date').innerHTML = n + ' ' + time + ampm;
             }
         </script>
     </body>
