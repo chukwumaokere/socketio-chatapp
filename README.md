@@ -16,3 +16,5 @@ It has the advantages of software like https://www.ringcentral.com/digital-custo
 5) ~~Bold the message senders name~~
 6) Fix the date stamp
 7) ~~Render messages on opposite sides~~
+8) ~~update styles of chat~~
+9) Fix hovering date to either stay updated or to scroll.
