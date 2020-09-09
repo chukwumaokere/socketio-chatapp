@@ -295,7 +295,7 @@
                   <div id="conversation-body" style="max-height: 20rem; overflow: auto;">
                      
                   </div>
-                  <!--<div id="typing-notif" style="text-align: center;color: rgb(0 0 0 / 50%);visibility: hidden;">Someone is typing...</div>-->
+                  <div id="typing-notif" style="text-align: center;color: rgb(0 0 0 / 50%);visibility: hidden;">Someone is typing...</div>
               </div>
               <form action="" id="message-form">
                   <div id="conversation-input" class="input-group input-group-md" style="box-shadow: 0 5px 25px 0 rgba(0,0,0,.30)">
@@ -320,6 +320,8 @@
             var current_user_id = document.getElementById('current_user_id').value;
             var userName = document.getElementsByClassName('userName')[0].title;
             const messagediv = document.getElementById('conversation-body');
+            var typing = false;
+            var timeout;
             var socket = io.connect('http://localhost:8084');
             socket.on('connect', function () {
                 socket.send('chat supervisor connected to server');
@@ -340,7 +342,6 @@
                     var time = today.getHours() + ":" + minutes;
                     console.log('chat message received', message);
                     if(c_u_id == userName){
-                      
                       $("#conversation-body").append($('<p class="bg-info text-white border-info" style="margin-left: auto;margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
                         $("#conversation-body").append($('<p style="text-align:right;margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
                     }else{
@@ -374,7 +375,34 @@
                         scrollToBottom();
                     }
                 })
+                socket.on('display_typing', function(status, user_id){
+                  var typing_notif = document.getElementById('typing-notif');
+                  if(status == true){
+                    if(user_id == userName){
+                    }else{
+                      typing_notif.innerHTML = user_id + ' is typing...'
+                      typing_notif.style.visibility = "visible";
+                    }
+                  }else{
+                    typing_notif.style.visibility = 'hidden';
+                  }
+                })
             }); 
+            $('#input-message').keypress((e) =>{ 
+              if(e.which != 13){
+                typing = true;
+                socket.emit('typing', true, userName);
+                clearTimeout(timeout)
+                timeout = setTimeout(function(){
+                  typing = false;
+                  socket.emit('typing', false, userName);
+                }, 1500)
+              }else{
+                clearTimeout(timeout)
+                typing = false
+                socket.emit('typing', false, userName);
+              }
+            })
             function openChat(){
                 updateDate();
                 document.getElementById('chat-button').style.display = "none";

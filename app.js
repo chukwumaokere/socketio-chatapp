@@ -34,6 +34,15 @@ server.sockets.on('connection', function (socket) {
 	socket.on('disconnect', function () {
 		console.log('disconnected!')
 	});
+	socket.on('typing', function(status ,user_id){
+		var room = Object.keys(socket.rooms)[0];
+		if(status == true){
+			server.to(room).emit('display_typing', true, user_id);
+		}else{
+			server.to(room).emit('display_typing', false, user_id)
+		}
+		
+	})
 	function getRooms(){
 		const rooms = server.sockets.adapter.rooms;
 		return rooms;

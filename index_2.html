@@ -295,7 +295,7 @@
                   <div id="conversation-body" style="max-height: 20rem; overflow: auto;">
                      
                   </div>
-                  <!--<div id="typing-notif" style="text-align: center;color: rgb(0 0 0 / 50%);visibility: hidden;">Someone is typing...</div>-->
+                  <div id="typing-notif" style="text-align: center;color: rgb(0 0 0 / 50%);visibility: hidden;">Someone is typing...</div>
               </div>
               <form action="" id="message-form">
                   <div id="conversation-input" class="input-group input-group-md" style="box-shadow: 0 5px 25px 0 rgba(0,0,0,.30)">
@@ -324,6 +324,7 @@
            var inRoom = false;
            var failedFind = true;
            var inter;
+           var timeout;
            var socket = io.connect('http://localhost:8084');
             socket.on('connect', function () {
                 socket.send('regular user connected to server');
@@ -393,7 +394,34 @@
                         scrollToBottom();
                     }
                 })
+                socket.on('display_typing', function(status, user_id){
+                  var typing_notif = document.getElementById('typing-notif');
+                  if(status == true){
+                    if(user_id == userName){
+                    }else{
+                      typing_notif.innerHTML = user_id + ' is typing...'
+                      typing_notif.style.visibility = "visible";
+                    }
+                  }else{
+                    typing_notif.style.visibility = 'hidden';
+                  }
+                })
             });  
+            $('#input-message').keypress((e) =>{ 
+              if(e.which != 13){
+                typing = true;
+                socket.emit('typing', true, userName);
+                clearTimeout(timeout)
+                timeout = setTimeout(function(){
+                  typing = false;
+                  socket.emit('typing', false, userName);
+                }, 1500)
+              }else{
+                clearTimeout(timeout)
+                typing = false
+                socket.emit('typing', false, userName);
+              }
+            })
             function openChat(){
                 socket.emit('join_random_room', userName);
                 updateDate();
