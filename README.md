@@ -1,7 +1,8 @@
 # Code for an easily embeddable chat app
 
 This chat app emulates the same idea of running a chat app using something like Google Firebase.
-It has the advantages of software like https://www.ringcentral.com/digital-customer-engagement.html or any other customer engagement service, FREE OF COST. It has no concurrent connection limit 
+It has the advantages of software like https://www.ringcentral.com/digital-customer-engagement.html or any other customer engagement service, FREE OF COST. It has no concurrent connection limit  
+Your chats are on the right, theirs are on the left. 
 
 ## How to run:
 1) Embed the HTML and script into your index.html file
