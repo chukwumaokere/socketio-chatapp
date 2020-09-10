@@ -20,6 +20,7 @@ Your chats are on the right, theirs are on the left.
 8) ~~update styles of chat~~
 9) Fix hovering date to either stay updated or to scroll.
 10) ~~Add "User is typing..." feature~~
+11) Edit scrollwheel style
 
 
 ### DEMO:
