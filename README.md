@@ -26,6 +26,8 @@ Your chats are on the right, theirs are on the left.
 ### DEMO:
 
 #### New Version: 
+Gif of new version of chat<br>
+![Gif if new version of chat](https://i.gyazo.com/36b7f63cbe65852f186978c5ef083f2f.gif)<br>
 Image of chat that fills up the screen from Customer Service perspective<br>
 ![Image of chat that fills up the screen from Customer Service representative perspective](https://i.gyazo.com/8513f7e373bb7df90140efa13d575aa9.png)<br>
 Image of chat that fills up the screen from Customers perspective<br>
