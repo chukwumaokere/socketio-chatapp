@@ -15,7 +15,7 @@ Your chats are on the right, theirs are on the left.
 3) Add support for auto-connecting if the chat window is already open and user navigates or refresh (will need to store the value of the connected room then use JS to reopen and reconnect to a specific room using join_room directly)
 4) ~~If msg == room is full, setTimeout every 30 seconds join_random_room until joinedRoom == true~~
 5) ~~Bold the message senders name~~
-6) Fix the date stamp
+6) ~~Fix the date stamp~~
 7) ~~Render messages on opposite sides~~
 8) ~~update styles of chat~~
 9) Fix hovering date to either stay updated or to scroll.
