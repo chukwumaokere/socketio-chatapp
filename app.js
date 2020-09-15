@@ -10,7 +10,7 @@ server.sockets.on('connection', function (socket) {
 		socket.join(roomId)
 		socket.send('socket joined room ' + roomId + ' successfully')
 		server.to(roomId).send('a new user has entered the chat room')
-		server.to(roomId).emit('user_joined', socket.id, name, roomId);
+		server.to(roomId).emit('user_joined', socket.id, name, roomId, fresh = false);
 	});
 	socket.on('join_random_room', function(user_id){
 		getAvailableRoom().then(roomId => {
@@ -19,7 +19,7 @@ server.sockets.on('connection', function (socket) {
 				socket.join(roomId);
 				socket.send('socket joined room ' + roomId + ' successfully')
 				server.to(roomId).send('a new user has entered the chat room')
-				server.to(roomId).emit('user_joined', socket.id, user_id, roomId);
+				server.to(roomId).emit('user_joined', socket.id, user_id, roomId, fresh = true);
 			}else{
 				socket.send('There are no available rooms right now, please wait for a chat supervisor to become available');
 			}

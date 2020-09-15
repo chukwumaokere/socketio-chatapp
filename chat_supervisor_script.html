@@ -5,8 +5,17 @@
             const messagediv = document.getElementById('conversation-body');
             var typing = false;
             var timeout;
+            var message_history;
             var socket = io.connect('http://localhost:8084');
             socket.on('connect', function () {
+                try{
+                  message_history = localStorage.getItem('message_history');
+                }catch(err){
+                  console.log('No message history or previous room', err);
+                }
+                if(message_history){
+                  openChat();
+                }
                 socket.send('chat supervisor connected to server');
                 socket.on('message', function (msg) {
                     console.log(msg);
@@ -35,14 +44,17 @@
                     if (shouldScroll){
                         scrollToBottom();
                     }
+                    message_history = messagediv.innerHTML;
+                    localStorage.setItem('message_history', message_history);
                 })
-                socket.on('user_joined', function(user, user_id){
+                socket.on('user_joined', function(user, user_id, roomId, fresh){
                   if(user_id == userName){
                     $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
                     document.getElementById('rep-name').innerHTML = "Connected";
                   }else{
-                    $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
-                    //document.getElementById('rep-name').innerHTML = user_id;
+                    if(fresh === true){
+                      $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
+                    }
                     document.getElementById('rep-name').innerHTML = "Connected";
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
@@ -87,13 +99,31 @@
               }
             })
             function openChat(){
-                updateDate();
-                document.getElementById('chat-button').style.display = "none";
-                document.getElementById('chat-widget').style.display = "flex";
+              try{
+                message_history = localStorage.getItem('message_history');
+              }catch(err){
+                console.log('No message history or previous room', err);
+              }
+              if(message_history){
+                messagediv.innerHTML = message_history;
+              }
+              updateDate();
+              document.getElementById('chat-button').style.display = "none";
+              document.getElementById('chat-widget').style.display = "flex";
+              var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+              if (shouldScroll){
+                  scrollToBottom();
+              }
             }
             function closeChat(){
                 document.getElementById('chat-button').style.display = "inline-block";
                 document.getElementById('chat-widget').style.display = "none";
+                try{
+                  localStorage.removeItem('message_history');
+                  messagediv.innerHTML = '';
+                }catch(err){
+                  console.log('failed to remove history', err);
+                }
             } 
             $('#message-form').submit(function(e){
                 e.preventDefault();
