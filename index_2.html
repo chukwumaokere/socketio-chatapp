@@ -386,11 +386,13 @@
                 })
                 socket.on('user_joined', function(user, user_id, roomId, fresh){
                   if(user_id == userName){
-                    $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
+                    if(fresh===true){
+                      $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
+                    }
                     document.getElementById('rep-name').innerHTML = "Connected";
                     localStorage.setItem('resumeRoom', roomId);
                   }else{
-                    if(fresh){
+                    if(fresh===true){
                       $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
                     }
                     document.getElementById('rep-name').innerHTML = "Connected";
