@@ -325,9 +325,20 @@
            var failedFind = true;
            var inter;
            var timeout;
+           var resumeRoom;
+           var message_history;
            var socket = io.connect('http://localhost:8084');
             socket.on('connect', function () {
                 socket.send('regular user connected to server');
+                try{
+                  resumeRoom = localStorage.getItem('resumeRoom');
+                  message_history = localStorage.getItem('message_history');
+                }catch(err){
+                  console.log('No message history or previous room', err);
+                }
+                if(resumeRoom){
+                  openChat();
+                }
                 socket.on('message', function (msg) {
                     console.log(msg);
                     if(msg == "There are no available rooms right now, please wait for a chat supervisor to become available"){
@@ -360,25 +371,27 @@
                     var time = today.getHours() + ":" + minutes;
                     console.log('chat message received', message);
                     if(c_u_id == userName){
-                      
                       $("#conversation-body").append($('<p class="bg-info text-white border-info" style="margin-left: auto;margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
-                        $("#conversation-body").append($('<p style="text-align:right;margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
+                      $("#conversation-body").append($('<p style="text-align:right;margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
                     }else{
-                        $("#conversation-body").append($('<p class="bg-secondary text-white border-secondary" style="margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
-                        $("#conversation-body").append($('<p style="margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
+                      $("#conversation-body").append($('<p class="bg-secondary text-white border-secondary" style="margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
+                      $("#conversation-body").append($('<p style="margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
                     }
                     var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                     if (shouldScroll){
                         scrollToBottom();
                     }
+                    message_history = document.getElementById('conversation-body').innerHTML;
+                    localStorage.setItem('message_history', message_history);
                 })
                 socket.on('entered_room', function(roomId, ownerName){
                   
                 })
-                socket.on('user_joined', function(user, user_id){
+                socket.on('user_joined', function(user, user_id, roomId){
                   if(user_id == userName){
                     $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
                     document.getElementById('rep-name').innerHTML = "Connected";
+                    localStorage.setItem('resumeRoom', roomId);
                   }else{
                     $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
                     //document.getElementById('rep-name').innerHTML = user_id;
@@ -426,10 +439,28 @@
               }
             })
             function openChat(){
+              try{
+                resumeRoom = localStorage.getItem('resumeRoom');
+                message_history = localStorage.getItem('message_history');
+              }catch(err){
+                console.log('No message history or previous room', err);
+              }
+              if(resumeRoom){
+                socket.emit('join_room', resumeRoom, userName);
+                updateDate();
+                document.getElementById('conversation-body').innerHTML = message_history;
+                document.getElementById('chat-button').style.display = "none";
+                document.getElementById('chat-widget').style.display = "flex";
+                var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                if (shouldScroll){
+                    scrollToBottom();
+                }
+              }else{
                 socket.emit('join_random_room', userName);
                 updateDate();
                 document.getElementById('chat-button').style.display = "none";
                 document.getElementById('chat-widget').style.display = "flex";
+              }
             }
             function closeChat(){
                 socket.emit('leave_room', userName)
@@ -440,6 +471,13 @@
                 }
                 document.getElementById('chat-button').style.display = "inline-block";
                 document.getElementById('chat-widget').style.display = "none";
+                try{
+                  localStorage.removeItem('message_history');
+                  localStorage.removeItem('resumeRoom');
+                  document.getElementById('conversation-body').innerHTML = '';
+                }catch(err){
+                  console.log('failed to remove history', err);
+                }
             }
             $('#message-form').submit(function(e){
                 e.preventDefault();
