@@ -381,7 +381,7 @@
                     if (shouldScroll){
                         scrollToBottom();
                     }
-                    message_history = document.getElementById('conversation-body').innerHTML;
+                    message_history = messagediv.innerHTML;
                     localStorage.setItem('message_history', message_history);
                 })
                 socket.on('entered_room', function(roomId, ownerName){
@@ -448,7 +448,7 @@
               if(resumeRoom){
                 socket.emit('join_room', resumeRoom, userName);
                 updateDate();
-                document.getElementById('conversation-body').innerHTML = message_history;
+                messagediv.innerHTML = message_history;
                 document.getElementById('chat-button').style.display = "none";
                 document.getElementById('chat-widget').style.display = "flex";
                 var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
@@ -474,7 +474,7 @@
                 try{
                   localStorage.removeItem('message_history');
                   localStorage.removeItem('resumeRoom');
-                  document.getElementById('conversation-body').innerHTML = '';
+                  messagediv.innerHTML = '';
                 }catch(err){
                   console.log('failed to remove history', err);
                 }
