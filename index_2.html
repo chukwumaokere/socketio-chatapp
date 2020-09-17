@@ -309,6 +309,12 @@
                     <a class="btn btn-secondary" onclick="clearChatConfirm();">Yes</a> &nbsp;<a class="btn btn-secondary" onclick="clearChatDecline();">No</a>
                   </div>
                 </div>
+                <div id="disconnect-modal" style="width: 87%;height: 75%;z-index: 50;background-color: rgba(0,0,0, 80%);position: absolute;margin: 0;padding: 0;visibility:hidden">
+                  <p style="color: white;position: relative;top: 50%;text-align: center;">This will disconnect you from the Chat session, are you sure?</p>
+                  <div style="position: relative;top: 50%;text-align: center;">
+                      <a class="btn btn-secondary" onclick="disconnectChat();">Yes</a> &nbsp;<a class="btn btn-secondary" onclick="keepChatConnected();">No</a>
+                  </div>
+                </div>
                   <div id="message-date" style="text-align: center; color: rgb(0 0 0 / 50%);">DAY 00:00AM</div>
                   <div id="conversation-body" style="max-height: 20rem; overflow: auto;">
                      
@@ -485,23 +491,26 @@
               document.getElementById('chat-widget').style.display = "none";
             }
             function closeChat(){
-                socket.emit('leave_room', userName)
-                inRoom = false;
-                failedFind = false;
-                if(inter !== undefined){
-                    clearInterval(inter);
-                }
-                document.getElementById('chat-button').style.display = "inline-block";
-                document.getElementById('chat-widget').style.display = "none";
-                /*
-                try{
-                  localStorage.removeItem('message_history');
-                  localStorage.removeItem('resumeRoom');
-                  messagediv.innerHTML = '';
-                }catch(err){
-                  console.log('failed to remove history', err);
-                }
-                */
+              document.getElementById('disconnect-modal').style.visibility="visible";
+            }
+            function disconnectChat(){
+              socket.emit('leave_room', userName);
+              inRoom = false;
+                    failedFind = false;
+              if(inter !== undefined){
+                  clearInterval(inter);
+              }
+              document.getElementById('disconnect-modal').style.visibility="hidden";
+              $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have disconnected from the Chat Supervisor\'s room.'));
+              document.getElementById('rep-name').innerHTML = "Disconnected";
+              try{
+                localStorage.removeItem('resumeRoom');
+              }catch(err){
+                console.log('failed to remove something', err);
+              }
+            }
+            function keepChatConnected(){
+              document.getElementById('disconnect-modal').style.visibility="hidden";	
             }
             function clearChat(){
                 document.getElementById("clear-modal").style.visibility="visible";
