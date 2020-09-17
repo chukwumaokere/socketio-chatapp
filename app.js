@@ -53,8 +53,9 @@ server.sockets.on('connection', function (socket) {
 		let availableRooms = [];
 		let filteredRooms = [];
 		var availableRoom = Object.values(rooms).filter(obj => {
-			if (obj.length < 2){
+			if (obj.length < 2){ //ignore count if the name of the user is the same, disregard 2 of the same chat supervisors
 				availableRooms.push(Object.keys(rooms).find(key => rooms[key] === obj));
+				console.log(obj);
 			}
 		});
 		availableRooms.forEach(function(room){
