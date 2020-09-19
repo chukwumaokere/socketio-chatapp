@@ -79,4 +79,17 @@ server.sockets.on('connection', function (socket) {
 		var room = Object.keys(socket.rooms)[0];
 		server.to(room).emit('chat_message_received', message, current_user_id);
 	})
+	socket.on('kick_user', function(owner_room_id){
+		var room = Object.keys(socket.rooms)[0];
+		server.to(room).emit('get_out', owner_room_id);
+		
+	})
+	socket.on('destroy_room', function(owner_room_id){
+		var room = Object.keys(socket.rooms)[0];
+		server.to(room).emit('get_out', owner_room_id);
+		
+		const rooms = Object.keys(socket.rooms);
+		const roomId = rooms[0];
+		socket.leave(roomId)
+	})
 });

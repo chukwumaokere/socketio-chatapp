@@ -7,6 +7,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
         <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="css/chatcss.css">
     </head>
     <body>
         <!--
@@ -269,17 +270,25 @@
       <div class="button-holder" style="position: fixed;bottom: 20px;right: 30px;z-index: 99;z-index: 1000;">
           <button type="button" class="btn btn-info btn-lg" style="border-radius:50%;" onclick="openChat();" id="chat-button">
               <div class="chat-bubble-div" style="padding: 5px 2px;">
+                <span id="unread-message-count" style="vertical-align: text-top;"></span>
                 <svg focusable="false" fill="#fff" aria-hidden="true" viewBox="0 0 28 32" width="28" height="32"><path d="M28,32 C28,32 23.2863266,30.1450667 19.4727818,28.6592 L3.43749107,28.6592 C1.53921989,28.6592 0,27.0272 0,25.0144 L0,3.6448 C0,1.632 1.53921989,0 3.43749107,0 L24.5615088,0 C26.45978,0 27.9989999,1.632 27.9989999,3.6448 L27.9989999,22.0490667 L28,22.0490667 L28,32 Z M23.8614088,20.0181333 C23.5309223,19.6105242 22.9540812,19.5633836 22.5692242,19.9125333 C22.5392199,19.9392 19.5537934,22.5941333 13.9989999,22.5941333 C8.51321617,22.5941333 5.48178311,19.9584 5.4277754,19.9104 C5.04295119,19.5629428 4.46760991,19.6105095 4.13759108,20.0170667 C3.97913051,20.2124916 3.9004494,20.4673395 3.91904357,20.7249415 C3.93763774,20.9825435 4.05196575,21.2215447 4.23660523,21.3888 C4.37862552,21.5168 7.77411059,24.5386667 13.9989999,24.5386667 C20.2248893,24.5386667 23.6203743,21.5168 23.7623946,21.3888 C23.9467342,21.2215726 24.0608642,20.9827905 24.0794539,20.7254507 C24.0980436,20.4681109 24.0195551,20.2135019 23.8614088,20.0181333 Z"></path></svg>
               </div>
           </button>
       </div>
       <div class="">
           <div class="card" id="chat-widget" style="width: 20rem;position: fixed;bottom: 20px;right: 30px;z-index: 99;z-index: 1000; min-height: 30rem;box-shadow: 0 5px 25px 0 rgba(0,0,0,.30); display: none;"> 
-              <div class="card-header text-white bg-info">
+              <div class="card-header text-white bg-info" id="chat-widget-header">
                   <div class="container row mx-0 px-0">
                       <div id="rep-name" style="width: max-content">Awaiting Chat...</div>
                       <div class="ml-auto float-right">
-                        <a class="btn btn-light btn-sm" onclick="clearChat()">Clear Chat</a> &nbsp;
+                        <div class="dropdown">
+                          <button onclick="openDropdown()" class="dropbtn btn btn-light btn-sm">Options</button>
+                          <div id="myDropdown" class="dropdown-content">
+                            <a class="btn btn-light btn-sm" onclick="clearChat()">Clear Chat</a> 
+                            <a class="btn btn-light btn-sm" onclick="closeChat()" id="toggle-status">Go Offline</a>
+                            <a class="btn btn-light btn-sm" onclick="kickUser()">Kick User</a>
+                          </div>
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp;
                       </div>
                       <div class="float-right" style="padding-right: 8px;">
                         <a type="button" class="float-right" style="align-self: center;" onclick="minimizeChat()">
@@ -382,6 +391,24 @@
                     if (shouldScroll){
                         scrollToBottom();
                     }
+                    var chatFocus = document.getElementById('input-message');
+                    if (chatFocus === document.activeElement) {
+                        console.log('chat-open');
+                    }else{
+                        if (document.getElementById("chat-widget").classList.contains("hidden_chat")) {
+                            document.getElementById("chat-button").classList.add("toggle-orange");
+                            var unreadMesg = document.getElementById("unread-message-count").textContent;
+                            if (unreadMesg == ''){
+                                var newunreadMesg = 1;
+                            }else{
+                                var newunreadMesg = parseInt(unreadMesg)+1;
+                            }
+                            document.getElementById("unread-message-count").innerHTML = newunreadMesg;
+                        }else{
+                            document.getElementById("chat-widget-header").classList.add("toggle-orange");
+                        }
+                        console.log('No focus on chat');
+                    }
                     message_history = messagediv.innerHTML;
                     localStorage.setItem('message_history', message_history);
                 })
@@ -452,36 +479,36 @@
               if (shouldScroll){
                   scrollToBottom();
               }
+              document.getElementById("input-message").focus();
+              document.getElementById("chat-widget").classList.remove("hidden_chat");
+              document.getElementById("chat-button").classList.remove("toggle-orange");
+              document.getElementById("unread-message-count").innerHTML = '';
             }
             function minimizeChat(){
               document.getElementById('chat-button').style.display = "inline-block";
               document.getElementById('chat-widget').style.display = "none";
+              document.getElementById("chat-widget").classList.add("hidden_chat");
             }
-            function closeChat(){
-                /*
-                document.getElementById('chat-button').style.display = "inline-block";
-                document.getElementById('chat-widget').style.display = "none";
-                */
-                /*
-                try{
-                  localStorage.removeItem('message_history');
-                  messagediv.innerHTML = '';
-                }catch(err){
-                  console.log('failed to remove history', err);
-                }
-                */
-            } 
 
             function closeChat(){
-              document.getElementById('disconnect-modal').style.visibility="visible";
+              if(document.getElementById("toggle-status").innerHTML == "Go Offline"){
+                document.getElementById('disconnect-modal').style.visibility="visible";   
+              }else{
+                socket.emit('create_room', current_user_id);
+                document.getElementById('chat-widget-header').style="";
+                document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
+                document.getElementById("toggle-status").innerHTML = "Go Offline";
+              }
             }
             function disconnectChat(){
-                socket.emit('leave_room', userName);
-          //socket.emit('kick_users');
-          //socket.emit('destroy_room', user_id);
+                //socket.emit('leave_room', userName);
+                //socket.emit('kick_users');
+                socket.emit('destroy_room', current_user_id);
                 document.getElementById('disconnect-modal').style.visibility="hidden";
-                $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have gone offline. Please reopen the chat window to restart your session.'));
-                document.getElementById('rep-name').innerHTML = "Disconnected";
+                $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have gone offline. Please select "Go Online" in the chat options to reopen your room.'));
+                document.getElementById('rep-name').innerHTML = "Offline";
+                document.getElementById("toggle-status").innerHTML = "Go Online";
+                document.getElementById('chat-widget-header').style="background-color: #5a5a5a!important;"
             }
             function keepChatConnected(){
                 document.getElementById('disconnect-modal').style.visibility="hidden";
@@ -534,6 +561,32 @@
 
               var n = weekday[d.getDay()];
               document.getElementById('message-date').innerHTML = n + ' ' + time + ampm;
+            }
+            $(document).on("click","#chat-widget",function(){
+                $('#input-message').focus();
+            });
+            $("#input-message").focusin(function(){
+                $('#chat-widget-header').removeClass("toggle-orange");
+            });
+            function kickUser(){
+              socket.emit('kick_user', current_user_id);
+            }
+            function openDropdown() {
+              document.getElementById("myDropdown").classList.toggle("showdd");
+            }
+
+            // Close the dropdown menu if the user clicks outside of it
+            window.onclick = function(event) {
+              if (!event.target.matches('.dropbtn')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                  var openDropdown = dropdowns[i];
+                  if (openDropdown.classList.contains('showdd')) {
+                    openDropdown.classList.remove('showdd');
+                  }
+                }
+              }
             }
         </script>
     </body>
