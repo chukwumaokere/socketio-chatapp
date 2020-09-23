@@ -13,6 +13,9 @@
         background-color: #17a2b8;
     }
 }
+.hide {
+    visibility: hidden;
+}
 #unread-message-count{
     position: fixed;
     bottom: 60px;
