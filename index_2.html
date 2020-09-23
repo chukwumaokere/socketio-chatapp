@@ -329,7 +329,7 @@
                 <div id="disconnect-and-close-modal" style="width: 87%;height: 75%;z-index: 50;background-color: rgba(0,0,0, 80%);position: absolute;margin: 0;padding: 0;visibility:hidden">
                   <p style="color: white;position: relative;top: 50%;text-align: center;">This will disconnect you from the Chat session, are you sure?</p>
                   <div style="position: relative;top: 50%;text-align: center;">
-                      <a class="btn btn-secondary" onclick="disconnectAndCloseConfirm();">Yes</a> &nbsp;<a class="btn btn-secondary" onclick="keepChatConnected();">No</a>
+                      <a class="btn btn-secondary" onclick="disconnectAndCloseConfirm();">Yes</a> &nbsp;<a class="btn btn-secondary" onclick="keepChatConnectedDCC();">No</a>
                   </div>
                 </div>
                   <div id="message-date" style="text-align: center; color: rgb(0 0 0 / 50%);">DAY 00:00AM</div>
@@ -571,6 +571,9 @@
                 console.log('failed to remove something', err);
               }
               document.getElementById('toggle-status').innerHTML="Reconnect"
+            }
+            function keepChatConnectedDCC(){
+              document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
             }
             function disconnectAndClose(){ 
               if(document.getElementById('rep-name').innerHTML == "Disconnected"){
