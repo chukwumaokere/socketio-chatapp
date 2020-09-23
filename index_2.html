@@ -383,6 +383,7 @@
                       failedFind = true;
                       if(inRoom == false && failedFind == true){
                         document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
+                        document.getElementById('chat-widget-header').style="";
                         console.log('Retrying connection...');
                         $("#conversation-body").append($('<p style="font-weight:bold">').text(msg));
                         $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('Retrying connection...'));
