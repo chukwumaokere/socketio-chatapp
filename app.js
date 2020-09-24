@@ -59,7 +59,7 @@ server.sockets.on('connection', function (socket) {
 			}
 		});
 		availableRooms.forEach(function(room){
-			if(room.match(/(^\d+$)/)){
+			if(room.match(/(^\d+-.+$)|(^\d+$)/)){
 				filteredRooms.push(room);
 			};
 		})

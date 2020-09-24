@@ -27,6 +27,7 @@
         </div>
     -->
     <input type="hidden" id="current_user_id" value="74">
+    <input type="hidden" id="rolename" value="Agent Support">
         <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
       <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Company name</a>
       <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -356,221 +357,222 @@
         <script src="js/dashboard.js"></script>
         <script type="text/javascript" src="js/socket.io.js"></script>
         <script>
-           var current_user_id = document.getElementById('current_user_id').value;
-            var userName = document.getElementsByClassName('userName')[0].title;
-            const messagediv = document.getElementById('conversation-body');
-            var typing = false;
-            var timeout;
-            var message_history;
-            var socket = io.connect('http://localhost:8084');
-            socket.on('connect', function () {
-                try{
-                  message_history = localStorage.getItem('message_history');
-                }catch(err){
-                  console.log('No message history or previous room', err);
-                }
-                if(message_history){
-                  openChat();
-                }
-                socket.send('chat supervisor connected to server');
-                socket.on('message', function (msg) {
-                    console.log(msg);
-                });
-                socket.emit('create_room', current_user_id);
-                socket.on('chat_message_received', function(message, c_u_id){
-                    var today = new Date();
-                    var minutes = today.getMinutes();
-                    var hours = today.getHours();
-                    var ampm = hours >= 12 ? 'PM' : 'AM';
-                    hours = hours % 12;
-                    hours = hours ? hours : 12;
-                    if (minutes < 10){
-                      minutes = '0' + minutes;
-                    }
-                    var time = today.getHours() + ":" + minutes;
-                    console.log('chat message received', message);
-                    if(c_u_id == userName){
-                      $("#conversation-body").append($('<p class="bg-info text-white border-info" style="margin-left: auto;margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
-                        $("#conversation-body").append($('<p style="text-align:right;margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
-                    }else{
-                        $("#conversation-body").append($('<p class="bg-secondary text-white border-secondary" style="margin-bottom:0px;border: 2px solid lightgrey;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: lightgrey;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
-                        $("#conversation-body").append($('<p style="margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
-                    }
-                    var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-                    if (shouldScroll){
-                        scrollToBottom();
-                    }
-                    var chatFocus = document.getElementById('input-message');
-                    if (chatFocus === document.activeElement) {
-                        console.log('chat-open');
-                    }else{
-                        if (document.getElementById("chat-widget").classList.contains("hidden_chat")) {
-                            document.getElementById("chat-button").classList.add("toggle-orange");
-                            var unreadMesg = document.getElementById("unread-message-count-number").textContent;
-                            if (unreadMesg == ''){
-                                var newunreadMesg = 1;
-                            }else{
-                                var newunreadMesg = parseInt(unreadMesg)+1;
-                            }
-                            //document.getElementById("unread-message-count").innerHTML = newunreadMesg;
-                            if (newunreadMesg > 9){
-                                newunreadMesg = '9+';
-                            }
-                            document.getElementById("unread-message-count").classList.remove("hide");
-                            document.getElementById("unread-message-count-number").innerHTML = newunreadMesg;
-                        }else{
-                            document.getElementById("chat-widget-header").classList.add("toggle-orange");
-                        }
-                        console.log('No focus on chat');
-                    }
-                    message_history = messagediv.innerHTML;
-                    localStorage.setItem('message_history', message_history);
-                })
-                socket.on('user_joined', function(user, user_id, roomId, fresh){
-                  if(user_id == userName){
-                    $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
-                    document.getElementById('rep-name').innerHTML = "Connected";
-                  }else{
-                    if(fresh === true){
-                      $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
-                    }
-                    document.getElementById('rep-name').innerHTML = "Connected";
-                    var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-                    if (shouldScroll){
-                        scrollToBottom();
-                    }
-                  }
-                })
-                socket.on('user_left', function(user, user_id){
-                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has left the room'));
-                    document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
-                    var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-                    if (shouldScroll){
-                        scrollToBottom();
-                    }
-                })
-                socket.on('display_typing', function(status, user_id){
-                  var typing_notif = document.getElementById('typing-notif');
-                  if(status == true){
-                    if(user_id == userName){
-                    }else{
-                      typing_notif.innerHTML = user_id + ' is typing...'
-                      typing_notif.style.visibility = "visible";
-                    }
-                  }else{
-                    typing_notif.style.visibility = 'hidden';
-                  }
-                })
-            }); 
-            $('#input-message').keypress((e) =>{ 
-              if(e.which != 13){
-                typing = true;
-                socket.emit('typing', true, userName);
-                clearTimeout(timeout)
-                timeout = setTimeout(function(){
-                  typing = false;
-                  socket.emit('typing', false, userName);
-                }, 1500)
-              }else{
-                clearTimeout(timeout)
-                typing = false
-                socket.emit('typing', false, userName);
-              }
-            })
-            function openChat(){
+          console.log('supervisor')
+          var current_user_id = document.getElementById('current_user_id').value;
+          var userName = document.getElementsByClassName('userName')[0].title;
+          const messagediv = document.getElementById('conversation-body');
+          var typing = false;
+          var timeout;
+          var message_history;
+          var socket = io.connect('http://localhost:8084');
+          socket.on('connect', function () {
               try{
                 message_history = localStorage.getItem('message_history');
               }catch(err){
                 console.log('No message history or previous room', err);
               }
               if(message_history){
-                messagediv.innerHTML = message_history;
+                openChat();
               }
-              updateDate();
-              document.getElementById('chat-button').style.display = "none";
-              document.getElementById('chat-widget').style.display = "flex";
-              var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-              if (shouldScroll){
-                  scrollToBottom();
+              socket.send('chat supervisor connected to server');
+              socket.on('message', function (msg) {
+                  console.log(msg);
+              });
+              socket.emit('create_room', current_user_id);
+              socket.on('chat_message_received', function(message, c_u_id){
+                  var today = new Date();
+                  var minutes = today.getMinutes();
+                  var hours = today.getHours();
+                  var ampm = hours >= 12 ? 'PM' : 'AM';
+                  hours = hours % 12;
+                  hours = hours ? hours : 12;
+                  if (minutes < 10){
+                      minutes = '0' + minutes;
+                  }
+                  var time = hours + ":" + minutes;
+                  console.log('chat message received', message);
+                  if(c_u_id == userName){
+                      $("#conversation-body").append($('<p class="bg-info text-white border-info" style="margin-left: auto;margin-bottom:0px;border: 2px solid #17a2b8;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: #17a2b8;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
+                      $("#conversation-body").append($('<p style="text-align:right;margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
+                  }else{
+                      $("#conversation-body").append($('<p class="bg-secondary text-white border-secondary" style="margin-bottom:0px;border: 2px solid #17a2b8;border-radius: 1rem;padding: 5px 15px;width: max-content;background-color: #17a2b8;color: black;white-space: unset;overflow: auto;overflow-wrap: anywhere;max-width: 100%;">').text(message)) //.append('<strong> :You</strong>'));
+                      $("#conversation-body").append($('<p style="margin-bottom:0px;color: grey;">').text(c_u_id + ' ' + time + ampm));
+                  }
+                  var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                  if (shouldScroll){
+                      scrollToBottom();
+                  }
+
+                  var chatFocus = document.getElementById('input-message');
+                  if (chatFocus === document.activeElement) {
+                      console.log('chat-open');
+                  }else{
+                      if (document.getElementById("chat-widget").classList.contains("hidden_chat")) {
+                          document.getElementById("chat-button").classList.add("toggle-orange");
+                          var unreadMesg = document.getElementById("unread-message-count-number").textContent;
+                          if (unreadMesg == ''){
+                              var newunreadMesg = 1;
+                          }else{
+                              var newunreadMesg = parseInt(unreadMesg)+1;
+                          }
+                          if (newunreadMesg > 9){
+                              newunreadMesg = '9+';
+                          }
+                          document.getElementById("unread-message-count").classList.remove("hide");
+                          document.getElementById("unread-message-count-number").innerHTML = newunreadMesg;
+                      }else{
+                          document.getElementById("chat-widget-header").classList.add("toggle-orange");
+                      }
+                      console.log('No focus on chat');
+                  }
+
+                  message_history = messagediv.innerHTML;
+                  localStorage.setItem('message_history', message_history);
+              })
+              socket.on('user_joined', function(user, user_id, roomId, fresh){
+                  if(user_id == userName){
+                      $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
+                      document.getElementById('rep-name').innerHTML = "Connected";
+                  }else{
+                      if(fresh === true){
+                        $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
+                      }
+                      document.getElementById('rep-name').innerHTML = "Connected";
+                      var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                      if (shouldScroll){
+                          scrollToBottom();
+                      }
+                  }
+              })
+              socket.on('user_left', function(user, user_id){
+                  $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has left the room'));
+                  document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
+                  var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                  if (shouldScroll){
+                      scrollToBottom();
+                  }
+              })
+              socket.on('display_typing', function(status, user_id){
+                  var typing_notif = document.getElementById('typing-notif');
+                  if(status == true){
+                      if(user_id == userName){
+                      }else{
+                          typing_notif.innerHTML = user_id + ' is typing...'
+                          typing_notif.style.visibility = "visible";
+                      }
+                  }else{
+                      typing_notif.style.visibility = 'hidden';
+                  }
+              })
+          });
+          $('#input-message').keypress((e) =>{
+              if(e.which != 13){
+                  typing = true;
+                  socket.emit('typing', true, userName);
+                  clearTimeout(timeout)
+                  timeout = setTimeout(function(){
+                      typing = false;
+                      socket.emit('typing', false, userName);
+                  }, 1500)
+              }else{
+                  clearTimeout(timeout)
+                  typing = false
+                  socket.emit('typing', false, userName);
               }
+          })
+          function openChat(){
+            try{
+              message_history = localStorage.getItem('message_history');
+            }catch(err){
+              console.log('No message history or previous room', err);
+            }
+            if(message_history){
+              messagediv.innerHTML = message_history;
+            }
+            updateDate();
+            document.getElementById('chat-button').style.display = "none";
+            document.getElementById('chat-widget').style.display = "flex";
+            var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+            if (shouldScroll){
+                scrollToBottom();
+            }
               document.getElementById("input-message").focus();
               document.getElementById("chat-widget").classList.remove("hidden_chat");
               document.getElementById("chat-button").classList.remove("toggle-orange");
               document.getElementById("unread-message-count").classList.add("hide");
               document.getElementById("unread-message-count-number").innerHTML = '';
+          }
+          function minimizeChat(){
+            document.getElementById('chat-button').style.display = "inline-block";
+            document.getElementById('chat-widget').style.display = "none";
+            document.getElementById("chat-widget").classList.add("hidden_chat");
+          }
+          function closeChat(){
+            if(document.getElementById("toggle-status").innerHTML == "Go Offline"){
+        document.getElementById('disconnect-modal').style.visibility="visible";   
+            }else{
+        socket.emit('create_room', current_user_id);
+        document.getElementById('chat-widget-header').style="";
+        document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
+        document.getElementById("toggle-status").innerHTML = "Go Offline";
             }
-            function minimizeChat(){
-              document.getElementById('chat-button').style.display = "inline-block";
-              document.getElementById('chat-widget').style.display = "none";
-              document.getElementById("chat-widget").classList.add("hidden_chat");
+          }
+          function disconnectChat(){
+        //socket.emit('leave_room', userName);
+        //socket.emit('kick_users');
+        socket.emit('destroy_room', current_user_id);
+        document.getElementById('disconnect-modal').style.visibility="hidden";
+        $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have gone offline. Please select "Go Online" in the chat options to reopen your room.'));
+        document.getElementById('rep-name').innerHTML = "Offline";
+        document.getElementById("toggle-status").innerHTML = "Go Online";
+        document.getElementById('chat-widget-header').style="background-color: #5a5a5a!important;"
+          }
+          function disconnectAndClose(){ 
+            if(document.getElementById('rep-name').innerHTML == "Disconnected"){
+        minimizeChat();
+        document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
+            }else{
+        document.getElementById("disconnect-and-close-modal").style.visibility="visible";
             }
-
-            function closeChat(){
-              if(document.getElementById("toggle-status").innerHTML == "Go Offline"){
-                document.getElementById('disconnect-modal').style.visibility="visible";   
-              }else{
-                socket.emit('create_room', current_user_id);
-                document.getElementById('chat-widget-header').style="";
-                document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
-                document.getElementById("toggle-status").innerHTML = "Go Offline";
-              }
-            }
-            function disconnectChat(){
-                //socket.emit('leave_room', userName);
-                //socket.emit('kick_users');
-                socket.emit('destroy_room', current_user_id);
-                document.getElementById('disconnect-modal').style.visibility="hidden";
-                $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have gone offline. Please select "Go Online" in the chat options to reopen your room.'));
-                document.getElementById('rep-name').innerHTML = "Offline";
-                document.getElementById("toggle-status").innerHTML = "Go Online";
-                document.getElementById('chat-widget-header').style="background-color: #5a5a5a!important;"
-            }
-            function keepChatConnectedDCC(){
-              document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
-            }
-            function disconnectAndClose(){ 
-              if(document.getElementById('rep-name').innerHTML == "Disconnected"){
-                minimizeChat();
-                document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
-              }else{
-                document.getElementById("disconnect-and-close-modal").style.visibility="visible";
-              }
-            }
-            function disconnectAndCloseConfirm(){          
-                disconnectChat();
-                minimizeChat();
-                document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
-            }
-            function keepChatConnected(){
-                document.getElementById('disconnect-modal').style.visibility="hidden";
-            }
-            function clearChat(){
-                document.getElementById("clear-modal").style.visibility="visible";
-            }
-            function clearChatConfirm(){
-                document.getElementById("clear-modal").style.visibility="hidden";
-                messagediv.innerHTML="";
-                try{
-                        localStorage.removeItem('message_history');
-                }catch(err){
-                        console.log('clear failed', err);
-                }
-                updateDate();
-            }
-            function clearChatDecline(){
-                document.getElementById("clear-modal").style.visibility="hidden";
-                updateDate();
-            }
-            $('#message-form').submit(function(e){
-                e.preventDefault();
-                socket.emit('chat_message', $('#input-message').val(), userName);
-                $('#input-message').val('');
-                return false;
-            })
-            function scrollToBottom(){
+          }
+          function disconnectAndCloseConfirm(){          
+        disconnectChat();
+        minimizeChat();
+        document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
+          }
+          function keepChatConnectedDCC(){
+        document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
+          }
+          function keepChatConnected(){
+              document.getElementById('disconnect-modal').style.visibility="hidden";
+          }
+          function clearChat(){
+        document.getElementById("clear-modal").style.visibility="visible";
+          }
+          function clearChatConfirm(){
+        document.getElementById("clear-modal").style.visibility="hidden";
+        messagediv.innerHTML="";
+        try{
+          localStorage.removeItem('message_history');
+        }catch(err){
+          console.log('clear failed', err);
+        }
+        updateDate();
+          }
+          function clearChatDecline(){
+        document.getElementById("clear-modal").style.visibility="hidden";
+        updateDate();
+          }
+          $('#message-form').submit(function(e){
+              e.preventDefault();
+              socket.emit('chat_message', $('#input-message').val(), userName);
+              $('#input-message').val('');
+              return false;
+          })
+          function scrollToBottom(){
               messagediv.scrollTop = messagediv.scrollHeight;
-            }
-            function updateDate(){
+          }
+          function updateDate(){
               var d = new Date();
               var weekday = new Array(7);
               var hours = d.getHours();
@@ -586,39 +588,39 @@
               weekday[6] = "SAT";
               var minutes = d.getMinutes();
               if (minutes < 10){
-                minutes = '0' + minutes;
+                  minutes = '0' + minutes;
               }
-              var time = d.getHours() + ":" + minutes;
+              var time = hours + ":" + minutes;
 
               var n = weekday[d.getDay()];
               document.getElementById('message-date').innerHTML = n + ' ' + time + ampm;
-            }
-            $(document).on("click","#chat-widget",function(){
-                $('#input-message').focus();
-            });
-            $("#input-message").focusin(function(){
-                $('#chat-widget-header').removeClass("toggle-orange");
-            });
-            function kickUser(){
-              socket.emit('kick_user', current_user_id);
-            }
-            function openDropdown() {
-              document.getElementById("myDropdown").classList.toggle("showdd");
-            }
+          }
+          $(document).on("click","#chat-widget",function(){
+              $('#input-message').focus();
+          });
+          $("#input-message").focusin(function(){
+              $('#chat-widget-header').removeClass("toggle-orange");
+          });
+          function kickUser(){
+            socket.emit('kick_user', current_user_id);
+          }
+          function openDropdown() {
+            document.getElementById("myDropdown").classList.toggle("showdd");
+          }
 
-            // Close the dropdown menu if the user clicks outside of it
-            window.onclick = function(event) {
-              if (!event.target.matches('.dropbtn')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                var i;
-                for (i = 0; i < dropdowns.length; i++) {
-                  var openDropdown = dropdowns[i];
-                  if (openDropdown.classList.contains('showdd')) {
-                    openDropdown.classList.remove('showdd');
-                  }
-                }
-              }
-            }
+          // Close the dropdown menu if the user clicks outside of it
+          window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('showdd')) {
+            openDropdown.classList.remove('showdd');
+          }
+        }
+      }
+    }
         </script>
     </body>
 </html>
