@@ -1,5 +1,5 @@
 var server = require('socket.io').listen(8084);
-
+//var socket = io.connect('https://devl06.borugroup.com', {"transports": ['websocket']});
 server.sockets.on('connection', function (socket) {
 	socket.on('message', function (e) {
 		console.log(e); 
