@@ -332,6 +332,14 @@
                       <a class="btn btn-secondary" onclick="disconnectAndCloseConfirm();">Yes</a> &nbsp;<a class="btn btn-secondary" onclick="keepChatConnectedDCC();">No</a>
                   </div>
                 </div>
+                <div id="choose-modal" style="width: 87%;height: 75%;z-index: 50;background-color: rgba(0,0,0, 80%);position: absolute;margin: 0;padding: 0;visibility:hidden">
+                  <p style="color: white;position: relative;top: 20%;text-align: center;">Where would you like to connect to?</p>
+                  <div style="position: relative;top: 20%;text-align: center;">
+                    <div id="choose-modal-button-holder" style="display: inline-grid">
+                      
+                    </div>
+                  </div>
+                </div>
                   <div id="message-date" style="text-align: center; color: rgb(0 0 0 / 50%);">DAY 00:00AM</div>
                   <div id="conversation-body" style="max-height: 20rem; overflow: auto;">
                      
@@ -360,6 +368,7 @@
         <script type="text/javascript" src="js/socket.io.js"></script>
         <script>
           console.log('user')
+          var options = ['Agent Support', 'Medicare Verification'];
           var current_user_id = document.getElementById('current_user_id').value;
           var userName = document.getElementsByClassName('userName')[0].title;
           const messagediv = document.getElementById('conversation-body');
@@ -533,11 +542,13 @@
                     scrollToBottom();
                 }
               }else{
-                socket.emit('join_random_room', userName);
+                presentChooseModal();
+                //Show modal first with buttons from var options onclick="joinRandomRoom('destination')"
+                //socket.emit('join_random_room', userName);
                 updateDate();
                 document.getElementById('chat-button').style.display = "none";
                 document.getElementById('chat-widget').style.display = "flex";
-                document.getElementById("toggle-status").innerHTML = "Leave Room";
+                document.getElementById("toggle-status").innerHTML = "Reconnect";
               }
               document.getElementById("input-message").focus();
               document.getElementById("chat-widget").classList.remove("hidden_chat");
@@ -553,13 +564,14 @@
             document.getElementById("chat-widget").classList.add("hidden_chat");
           }
           function closeChat(){
-        if(document.getElementById("toggle-status").innerHTML ==  "Leave Room"){
-          document.getElementById('disconnect-modal').style.visibility="visible";
-              }else{
-          socket.emit('join_random_room', userName);
-          document.getElementById("toggle-status").innerHTML = "Leave Room"
-              }
-          }
+            if(document.getElementById("toggle-status").innerHTML ==  "Leave Room"){
+              document.getElementById('disconnect-modal').style.visibility="visible";
+            }else{
+            //socket.emit('join_random_room', userName);
+            //joinRandomRoom(userName, destination);
+            presentChooseModal();
+                }
+            }
           function disconnectChat(){
         socket.emit('leave_room', userName);
         inRoom = false;
@@ -595,6 +607,35 @@
           function keepChatConnected(){
         document.getElementById('disconnect-modal').style.visibility="hidden";
           }
+          function hideChooseModal(){
+            let chooseModal = document.getElementById('choose-modal');
+            chooseModal.style.visibility="hidden";
+          }
+          function presentChooseModal(){
+            let buttonHolder = document.getElementById('choose-modal-button-holder');
+                let chooseModal = document.getElementById('choose-modal');
+                options.forEach(function(option){
+                  if(!document.getElementById(`${option}-button`)){
+                    let button = document.createElement('a');
+                    button.textContent = option;
+                    button.setAttribute('class', 'btn btn-sm btn-secondary');
+                    button.setAttribute('onclick', `joinRandomRoom('${option}')`);
+                    button.setAttribute('id', `${option}-button`);
+                    buttonHolder.appendChild(button);
+                    buttonHolder.innerHTML += '&nbsp;';
+                  }
+                });
+                if(!document.getElementById('hide-choose-modal-button')){
+                  let noneButton = document.createElement('a');
+                  noneButton.textContent = "Cancel";
+                  noneButton.setAttribute('class', 'btn btn-sm btn-secondary');
+                  noneButton.setAttribute('onclick', `hideChooseModal()`);
+                  noneButton.setAttribute('id', 'hide-choose-modal-button');
+                  buttonHolder.appendChild(noneButton);
+                  buttonHolder.innerHTML += '&nbsp;';
+                }
+                chooseModal.style.visibility="visible";
+          }
           function keepChatConnectedDCC(){
               document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
           }
@@ -623,6 +664,11 @@
           })
           function scrollToBottom(){
               messagediv.scrollTop = messagediv.scrollHeight;
+          }
+          function joinRandomRoom(destination){
+            socket.emit('join_random_room', userName, destination);
+            hideChooseModal();
+            document.getElementById("toggle-status").innerHTML = "Leave Room";
           }
           function updateDate(){
               var d = new Date();
