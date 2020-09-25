@@ -360,6 +360,8 @@
           console.log('supervisor')
           var current_user_id = document.getElementById('current_user_id').value;
           var userName = document.getElementsByClassName('userName')[0].title;
+          var rolename = document.getElementById('rolename').value;
+          var roomid = current_user_id + '-' + rolename;
           const messagediv = document.getElementById('conversation-body');
           var typing = false;
           var timeout;
@@ -378,7 +380,7 @@
               socket.on('message', function (msg) {
                   console.log(msg);
               });
-              socket.emit('create_room', current_user_id);
+              socket.emit('create_room', roomid);
               socket.on('chat_message_received', function(message, c_u_id){
                   var today = new Date();
                   var minutes = today.getMinutes();
@@ -511,7 +513,7 @@
             if(document.getElementById("toggle-status").innerHTML == "Go Offline"){
         document.getElementById('disconnect-modal').style.visibility="visible";   
             }else{
-        socket.emit('create_room', current_user_id);
+        socket.emit('create_room', roomid);
         document.getElementById('chat-widget-header').style="";
         document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
         document.getElementById("toggle-status").innerHTML = "Go Offline";
@@ -520,7 +522,7 @@
           function disconnectChat(){
         //socket.emit('leave_room', userName);
         //socket.emit('kick_users');
-        socket.emit('destroy_room', current_user_id);
+        socket.emit('destroy_room', roomid);
         document.getElementById('disconnect-modal').style.visibility="hidden";
         $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have gone offline. Please select "Go Online" in the chat options to reopen your room.'));
         document.getElementById('rep-name').innerHTML = "Offline";
@@ -602,7 +604,7 @@
               $('#chat-widget-header').removeClass("toggle-orange");
           });
           function kickUser(){
-            socket.emit('kick_user', current_user_id);
+            socket.emit('kick_user', roomid);
           }
           function openDropdown() {
             document.getElementById("myDropdown").classList.toggle("showdd");
