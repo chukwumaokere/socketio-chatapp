@@ -31,7 +31,7 @@ server.sockets.on('connection', function (socket) {
 		console.log('Creating chat room', roomId);
 		socket.send('Creating chat room ' + roomId);
 		socket.send('Joining Chat Room ' + roomId);
-		console.log('Joining Chat Room', roomId, socket.id, socket.handshake.address /*socket.client*/);
+		console.log('Joining Chat Room', roomId, socket.id, /*socket.handshake.address*/ /*socket.client*/);
 		socket.join(roomId);
 	});
 	socket.on('disconnect', function () {
