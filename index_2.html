@@ -378,6 +378,7 @@
           var message_history;
           var inter;
           var timeout;
+          var dest;
           var socket = io.connect('http://localhost:8084');
           socket.on('connect', function () {
               socket.send('regular user connected to server');
@@ -396,16 +397,21 @@
                       failedFind = true;
                       if(inRoom == false && failedFind == true){
                           document.getElementById('rep-name').innerHTML = "Awaiting Chat...";
-              document.getElementById('chat-widget-header').style="";
+                          document.getElementById('chat-widget-header').style="";
                           console.log('Retrying connection...');
-                          $("#conversation-body").append($('<p style="font-weight:bold">').text(msg));
-                          $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('Retrying connection...'));
+                          if(!document.getElementById('loadingtext')){
+                            $("#conversation-body").append($('<p id="failed-message" style="font-weight:bold">').text(msg));
+                            $("#conversation-body").append($('<p id="loadingtext" style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">')); //.text('Retrying connection'));
+                            document.getElementById('loadingtext').innerHTML = 'Retrying connection<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+                          }else{
+                            showSearching();
+                          }
                           var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
                           if (shouldScroll){
                               scrollToBottom();
                           }
                           inter = setTimeout(function(){
-                              openChat();
+                              tryReconnect();
                           }, 3000);
                       }
                   }
@@ -438,49 +444,49 @@
                   if (chatFocus === document.activeElement) {
                       console.log('chat-open');
                   }else{
-                      if (document.getElementById("chat-widget").classList.contains("hidden_chat")) {
-                          document.getElementById("chat-button").classList.add("toggle-orange");
-                          var unreadMesg = document.getElementById("unread-message-count-number").textContent;
-                          if (unreadMesg == ''){
-                              var newunreadMesg = 1;
-                          }else{
-                              var newunreadMesg = parseInt(unreadMesg)+1;
-                          }
-                          if (newunreadMesg > 9){
-                              newunreadMesg = '9+';
-                          }
-                          document.getElementById("unread-message-count").classList.remove("hide");
-                          document.getElementById("unread-message-count-number").innerHTML = newunreadMesg;
+                    if (document.getElementById("chat-widget").classList.contains("hidden_chat")) {
+                      document.getElementById("chat-button").classList.add("toggle-orange");
+                      var unreadMesg = document.getElementById("unread-message-count-number").textContent;
+                      if (unreadMesg == ''){
+                        var newunreadMesg = 1;
                       }else{
-                          document.getElementById("chat-widget-header").classList.add("toggle-orange");
+                        var newunreadMesg = parseInt(unreadMesg)+1;
                       }
-                      console.log('No focus on chat');
+                      if (newunreadMesg > 9){
+                        newunreadMesg = '9+';
+                      }
+                      document.getElementById("unread-message-count").classList.remove("hide");
+                      document.getElementById("unread-message-count-number").innerHTML = newunreadMesg;
+                    }else{
+                      document.getElementById("chat-widget-header").classList.add("toggle-orange");
+                    }
+                    console.log('No focus on chat');
                   }
-
                   message_history = messagediv.innerHTML;
                   localStorage.setItem('message_history', message_history);
               })
               socket.on('user_joined', function(user, user_id, roomId, fresh){
-                  if(user_id == userName){
-
-                    console.log('joined supervisor room', fresh)
-                      if(fresh===true){
-                        $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
-                      }
-                      document.getElementById('rep-name').innerHTML = "Connected";
-          document.getElementById('chat-widget-header').style="";
-          localStorage.setItem('resumeRoom', roomId);
-                  }else{
-                      if(fresh === true){
-                          $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
-                      }
-                      document.getElementById('rep-name').innerHTML = "Connected";
-          document.getElementById('chat-widget-header').style="";
-                      var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
-                      if (shouldScroll){
-                          scrollToBottom();
-                      }
+                hideSearching();
+                dest = '';
+                if(user_id == userName){
+                  console.log('joined supervisor room', fresh)
+                  if(fresh===true){
+                    $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text('You have joined a chat supervisor\'s room'));
                   }
+                  document.getElementById('rep-name').innerHTML = "Connected";
+                  document.getElementById('chat-widget-header').style="";
+                  localStorage.setItem('resumeRoom', roomId);
+                }else{
+                  if(fresh === true){
+                    $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has joined the room'));
+                  }
+                  document.getElementById('rep-name').innerHTML = "Connected";
+                  document.getElementById('chat-widget-header').style="";
+                  var shouldScroll = messagediv.scrollTop + messagediv.clientHeight !== messagediv.scrollHeight;
+                  if (shouldScroll){
+                    scrollToBottom();
+                  }
+                }
               })
               socket.on('user_left', function(user, user_id){
                   $("#conversation-body").append($('<p style="color: rgb(0 0 0 / 50%);text-align: center;margin-bottom: 0;">').text(user_id + ' has left the room'));
@@ -573,6 +579,7 @@
                 }
             }
           function disconnectChat(){
+            hideSearching();
         socket.emit('leave_room', userName);
         inRoom = false;
               failedFind = false;
@@ -593,16 +600,16 @@
           }
           function disconnectAndClose(){ 
             if(document.getElementById('rep-name').innerHTML == "Disconnected"){
-        minimizeChat();
-        document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
+              minimizeChat();
+              document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
             }else{
-        document.getElementById("disconnect-and-close-modal").style.visibility="visible";
+              document.getElementById("disconnect-and-close-modal").style.visibility="visible";
             }
           }
           function disconnectAndCloseConfirm(){          
-        disconnectChat();
-        minimizeChat();
-        document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
+            disconnectChat();
+            minimizeChat();
+            document.getElementById("disconnect-and-close-modal").style.visibility="hidden";
           }
           function keepChatConnected(){
         document.getElementById('disconnect-modal').style.visibility="hidden";
@@ -666,9 +673,31 @@
               messagediv.scrollTop = messagediv.scrollHeight;
           }
           function joinRandomRoom(destination){
+            dest = destination;
             socket.emit('join_random_room', userName, destination);
             hideChooseModal();
             document.getElementById("toggle-status").innerHTML = "Leave Room";
+          }
+          function hideSearching(){
+            try{
+              document.getElementById('failed-message').style.display="none";
+              document.getElementById('loadingtext').style.display="none";
+            }catch(err){
+
+            }
+          }
+          function showSearching(){
+            try{
+              document.getElementById('failed-message').style.display="block";
+              document.getElementById('loadingtext').style.display="block";
+            }catch(err){
+              
+            }
+          }
+          function tryReconnect(){
+            if (dest !== undefined){
+              socket.emit('join_random_room', userName, dest);
+            }
           }
           function updateDate(){
               var d = new Date();

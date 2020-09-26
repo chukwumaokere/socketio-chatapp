@@ -12,8 +12,9 @@ server.sockets.on('connection', function (socket) {
 		server.to(roomId).send('a new user has entered the chat room')
 		server.to(roomId).emit('user_joined', socket.id, name, roomId, fresh = false);
 	});
-	socket.on('join_random_room', function(user_id){
-		getAvailableRoom().then(roomId => {
+	socket.on('join_random_room', function(user_id, room_type){
+		console.log('trying to join random room', user_id, room_type);
+		getAvailableRoom(room_type).then(roomId => {
 			if (roomId !== undefined){
 				socket.send('joining random room: ' + roomId);
 				socket.join(roomId);
@@ -30,6 +31,7 @@ server.sockets.on('connection', function (socket) {
 		console.log('Creating chat room', roomId);
 		socket.send('Creating chat room ' + roomId);
 		socket.send('Joining Chat Room ' + roomId);
+		console.log('Joining Chat Room', roomId, socket.id, socket.handshake.address /*socket.client*/);
 		socket.join(roomId);
 	});
 	socket.on('disconnect', function () {
@@ -57,7 +59,7 @@ server.sockets.on('connection', function (socket) {
 		const rooms = server.sockets.adapter.rooms;
 		return rooms;
 	}
-	async function getAvailableRoom(){
+	async function getAvailableRoom(roomtype){
 		const rooms = getRooms();
 		let availableRooms = [];
 		let filteredRooms = [];
@@ -69,8 +71,9 @@ server.sockets.on('connection', function (socket) {
 			}
 		});
 		availableRooms.forEach(function(room){
-			console.log('running regex on room', room);
-			if(room.match(/(^\d+-.+$)|(^\d+$)/)){
+			let regex = new RegExp('((^\\d+)|(^\\d+$))-(' + roomtype + ')'); // /((^\d+)|(^\d+$))-(roomtype)/
+			console.log('running regex on room', room, regex);
+			if(room.match(regex)){ //((^\d+)|(^\d+$))-(Agent Super) //(^\d+-.+$)|(^\d+$)
 				filteredRooms.push(room);
 			};
 		})
