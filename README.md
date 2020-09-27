@@ -20,7 +20,9 @@ Your chats are on the right, theirs are on the left.
 8) ~~update styles of chat~~
 9) ~~Fix hovering date to either stay updated or to scroll.~~
 10) ~~Add "User is typing..." feature~~
-11) Edit scrollwheel style
+~~ SCRAPPED: 11) Edit scrollwheel style~~
+12) use userid instead of username
+13) wrap the forEach's in asynchronous function calls to prevent race conditions 
 
 
 ### DEMO:
