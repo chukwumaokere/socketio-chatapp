@@ -377,11 +377,12 @@
               if(message_history){
                 openChat();
               }
+              socket.emit('update_username', userName);
               socket.send('chat supervisor connected to server');
               socket.on('message', function (msg) {
                   console.log(msg);
               });
-              socket.emit('create_room', roomid);
+              socket.emit('create_room', roomid, userName);
               socket.on('chat_message_received', function(message, c_u_id){
                   var today = new Date();
                   var minutes = today.getMinutes();

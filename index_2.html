@@ -391,6 +391,7 @@
                 if(resumeRoom){
                   openChat();
                 }
+              socket.emit('update_username', userName);
               socket.on('message', function (msg) {
                   console.log(msg);
                   if(msg == "There are no available rooms right now, please wait for a chat supervisor to become available"){

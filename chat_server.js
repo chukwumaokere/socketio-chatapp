@@ -7,16 +7,21 @@ server.sockets.on('connection', function (socket) {
 	});
 	socket.on('join_room', function(roomId, name) {
 		socket.send('socket joining specific room ' + roomId);
+		//socket.username = name;
 		socket.join(roomId)
 		socket.send('socket joined room ' + roomId + ' successfully')
 		server.to(roomId).send('a new user has entered the chat room')
 		server.to(roomId).emit('user_joined', socket.id, name, roomId, fresh = false);
 	});
+	socket.on('update_username', function(userName){
+		socket.username = userName;
+	})
 	socket.on('join_random_room', function(user_id, room_type){
-		console.log('trying to join random room', user_id, room_type);
+		console.log('User is trying to join random room', user_id, room_type);
 		getAvailableRoom(room_type).then(roomId => {
 			if (roomId !== undefined){
 				socket.send('joining random room: ' + roomId);
+				//socket.username = user_id;
 				socket.join(roomId);
 				socket.send('socket joined room ' + roomId + ' successfully')
 				server.to(roomId).send('a new user has entered the chat room')
@@ -27,11 +32,12 @@ server.sockets.on('connection', function (socket) {
 			
 		});
 	});
-	socket.on('create_room', function(roomId){
+	socket.on('create_room', function(roomId, userName){
 		console.log('Creating chat room', roomId);
 		socket.send('Creating chat room ' + roomId);
 		socket.send('Joining Chat Room ' + roomId);
-		console.log('Joining Chat Room', roomId, socket.id, /*socket.handshake.address*/ /*socket.client*/);
+		console.log('Joining Chat Room', roomId, socket.id, userName /*socket.handshake.address*/ /*socket.client*/);
+		//socket.username = userName;
 		socket.join(roomId);
 	});
 	socket.on('disconnect', function () {
@@ -63,20 +69,45 @@ server.sockets.on('connection', function (socket) {
 		const rooms = getRooms();
 		let availableRooms = [];
 		let filteredRooms = [];
-		var availableRoom = Object.values(rooms).filter(obj => {
-			console.log('found room:', obj);
-			if (obj.length < 2){ //ignore count if the name of the user is the same, disregard 2 of the same chat supervisors
-				availableRooms.push(Object.keys(rooms).find(key => rooms[key] === obj));
-				console.log(obj);
-			}
+		var availableRoom = Object.values(rooms).filter(room => {
+			/*
+			let sockets = Object.keys(room.sockets);
+			sockets.forEach(function(socket){
+				console.log('socket? ', server.sockets.sockets[socket].username); // server.sockets.adapter.sockets[socket]
+			});
+			*/
+			//console.log('found room:', room);
+			
+			//if (room.length < 2){ //ignore count if the name of the user is the same, disregard 2 of the same chat supervisors
+				availableRooms.push(Object.keys(rooms).find(key => rooms[key] === room));
+				//console.log('available room: ', room);
+			//}
 		});
 		availableRooms.forEach(function(room){
 			let regex = new RegExp('((^\\d+)|(^\\d+$))-(' + roomtype + ')'); // /((^\d+)|(^\d+$))-(roomtype)/
-			console.log('running regex on room', room, regex);
+			//console.log('running regex on room', room, /*regex*/);
 			if(room.match(regex)){ //((^\d+)|(^\d+$))-(Agent Super) //(^\d+-.+$)|(^\d+$)
-				filteredRooms.push(room);
+				console.log('MATCHED ROOM:', room);
+				let room_obj = server.sockets.adapter.rooms[room];
+				let sockets = Object.keys(room_obj.sockets);
+				let people_in_room = [];
+				sockets.forEach(function(socket){
+					let username = server.sockets.sockets[socket].username;
+					people_in_room.push(username);
+					//console.log('SOCKET USERNAME? ', username);
+				})
+				let allEqual = arr => arr.every(v => v === arr[0]);
+				if (allEqual(people_in_room)){
+					filteredRooms.push(room);
+					console.log('THIS ROOM IS AVAILABLE: ', room, people_in_room);
+				}else{
+					//occupied
+					console.log('PEOPLE IN THAT ROOM: ', people_in_room);
+				}
+				
 			};
 		})
+		console.log('AVAILABLE OPTIONS FOR ROOMS:', filteredRooms);
 		const chosenRoom = filteredRooms[0]; // = room with only 1 connected socket; first in line, round robin
 		console.log('chose room', chosenRoom);
 		return chosenRoom;
