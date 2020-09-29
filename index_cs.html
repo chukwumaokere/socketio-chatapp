@@ -359,10 +359,17 @@
         <script type="text/javascript" src="js/socket.io.js"></script>
         <script>
           console.log('supervisor')
+          var options = ['Agent Support', 'Medicare Verification'];
           var current_user_id = document.getElementById('current_user_id').value;
           var userName = document.getElementsByClassName('userName')[0].title;
           var rolename = document.getElementById('rolename').value;
-          var roomid = current_user_id + '-' + rolename;
+          var profilenames = document.getElementById('profilename').value;
+          var picked;
+          var profilename_arr = profilenames.split("|#|");
+          options.forEach(function(option){
+            picked = profilename_arr.filter(profile => profile.includes(option))
+          });
+          var roomid = current_user_id + '-' + picked;
           const messagediv = document.getElementById('conversation-body');
           var typing = false;
           var timeout;
